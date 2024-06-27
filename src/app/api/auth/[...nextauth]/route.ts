@@ -1,11 +1,11 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import { Account, User as AuthUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import connect from "@/utils/db";
 
-export const authOptions: any = {
+export const authOptions: any= {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
@@ -16,6 +16,7 @@ export const authOptions: any = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) {
+        // await connect();
         try {
           const user = await User.findOne({ email: credentials.email });
           if (user) {
@@ -27,19 +28,18 @@ export const authOptions: any = {
               return user;
             }
           }
-        } catch (err: any) {
-          throw new Error(err);
+        } catch (error: any) {
+          throw new Error(error);
         }
       },
     }),
     // ...add more providers here
   ],
-  callbacks: {
-    async signIn({ user, account }: { user: AuthUser; account: Account }) {
-      if (account?.provider == "credentials") {
-        return true;
-      }
-    },
+  async signIn({ user, account }: { user: AuthUser; account: Account }) {
+    if (account?.provider == "credentials") {
+      return true;
+    }
+    return false;
   },
 };
 
