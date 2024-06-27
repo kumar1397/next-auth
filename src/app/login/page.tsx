@@ -42,10 +42,12 @@ const Login = () => {
       password,
     });
 
+    console.log(res?.status);
     if (res?.error) {
       setError("Invalid email or password");
       if (res?.url) router.replace("/dashboard");
-    } else {
+    } 
+    else {
       setError("");
     }
   };

@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import connect from "@/utils/db";
 
-export const authOptions: any= {
+export const authOptions: any = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
@@ -16,7 +16,7 @@ export const authOptions: any= {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) {
-        // await connect();
+        await connect();
         try {
           const user = await User.findOne({ email: credentials.email });
           if (user) {
@@ -31,15 +31,20 @@ export const authOptions: any= {
         } catch (error: any) {
           throw new Error(error);
         }
+        return null; // Explicitly return null if user is not found or password is incorrect
       },
     }),
     // ...add more providers here
   ],
-  async signIn({ user, account }: { user: AuthUser; account: Account }) {
-    if (account?.provider == "credentials") {
-      return true;
-    }
-    return false;
+  callbacks: {
+    async signIn({ user, account }: { user: AuthUser; account: Account }) {
+      if (account.provider === "credentials") {
+        return true;
+      }
+      // Reject sign in for any provider other than credentials
+      return false;
+    },
+    // Other callbacks like redirect, session, jwt can be added here if needed
   },
 };
 
