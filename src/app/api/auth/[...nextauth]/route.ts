@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import { Account, User as AuthUser } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
@@ -17,7 +16,6 @@ export const authOptions: any = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) {
-        await connect();
         try {
           const user = await User.findOne({ email: credentials.email });
           if (user) {
